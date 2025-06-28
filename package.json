@@ -1,0 +1,36 @@
+{
+  "name": "ask-gemini",
+  "version": "0.1.0",
+  "description": "MCP server for Gemini access using OAuth tokens from Gemini CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "ask-gemini": "dist/index.js",
+    "ask-gemini-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": ["mcp", "gemini", "oauth", "ai", "llm"],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^24.0.6",
+    "@vitest/ui": "^3.2.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.2",
+    "google-auth-library": "^10.1.0",
+    "zod": "^3.25.67"
+  }
+}
