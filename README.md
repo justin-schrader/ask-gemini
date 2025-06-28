@@ -16,8 +16,19 @@ This server uses Google's internal Cloud Assist API with OAuth tokens from the G
 
 ## Installation
 
+### Option 1: Use directly from GitHub (no installation)
+
+Use with npx in your MCP configuration - see usage section below.
+
+### Option 2: Clone and install locally
+
 ```bash
-npm install -g ask-gemini
+# Clone the repository
+git clone https://github.com/justin-schrader/ask-gemini.git
+cd ask-gemini
+
+# Install globally from local directory
+npm install -g .
 ```
 
 ## Prerequisites
@@ -26,10 +37,23 @@ You must have authenticated with the Gemini CLI and have valid OAuth credentials
 
 ## Usage
 
-### With Claude Desktop
+### With Claude Desktop or Claude Code
 
-Add to your Claude Desktop configuration:
+Add to your Claude Desktop or Claude Code configuration:
 
+#### Option 1: Direct from GitHub (no installation):
+```json
+{
+  "mcpServers": {
+    "ask-gemini": {
+      "command": "npx",
+      "args": ["github:justin-schrader/ask-gemini"]
+    }
+  }
+}
+```
+
+#### Option 2: If installed locally:
 ```json
 {
   "mcpServers": {
@@ -40,12 +64,6 @@ Add to your Claude Desktop configuration:
 }
 ```
 
-### With other MCP clients
-
-```bash
-ask-gemini-mcp
-```
-
 ## Models
 
 Default model: `gemini-2.5-pro`
@@ -53,9 +71,6 @@ Default model: `gemini-2.5-pro`
 You can use any Gemini model by specifying it in the `model` parameter. Common models include:
 - gemini-2.5-pro (default)
 - gemini-2.5-flash
-- gemini-2.0-flash-exp
-- gemini-1.5-pro
-- gemini-1.5-flash
 
 Note: If an invalid model is specified, the API will return an error.
 
