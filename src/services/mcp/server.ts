@@ -21,7 +21,7 @@ export const createMcpServer = (
   
   server.tool(
     'gemini',
-    'Generate text using Google Gemini models with OAuth authentication',
+    'Generate text using Google Gemini models with OAuth authentication. Supports custom system prompts via the persona parameter.',
     GeminiToolSchema.shape,
     async (args) => {
       const validationResult = validateToolInput(args);
@@ -35,18 +35,26 @@ export const createMcpServer = (
         };
       }
       
-      const { model, messages, temperature, maxTokens } = validationResult.value;
+      const { model, messages, temperature, maxTokens, persona } = validationResult.value;
       
-      const apiMessages: Message[] = messages.map(msg => ({
+      let apiMessages: Message[] = messages.map(msg => ({
         role: msg.role,
         content: msg.content
       }));
+      
+      // Prepend persona as a system message
+      apiMessages = [
+        { role: 'user', content: persona },
+        { role: 'assistant', content: 'I understand. I will respond according to that persona.' },
+        ...apiMessages
+      ];
       
       logger.info('Processing Gemini request', { 
         model, 
         messageCount: messages.length,
         temperature,
-        maxTokens
+        maxTokens,
+        persona: persona.substring(0, 50) + '...'
       });
       
       let fullResponse = '';
