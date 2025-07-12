@@ -21,7 +21,7 @@ export const createMcpServer = (
   
   server.tool(
     'gemini',
-    'Generate text using Google Gemini models with OAuth authentication. Supports custom system prompts via the persona parameter.',
+    'Generate text using Google Gemini models with OAuth authentication. IMPORTANT: This is a stateless, one-shot API - each request is independent with no memory of previous interactions. Each call to Gemini is completely isolated and cannot reference or recall any prior conversations. Supports custom system prompts via the persona parameter.',
     GeminiToolSchema.shape,
     async (args) => {
       const validationResult = validateToolInput(args);
