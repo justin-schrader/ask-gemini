@@ -21,21 +21,52 @@ export const createMcpServer = (
   
   server.tool(
     'gemini',
-    `Generate text using Google Gemini models with OAuth authentication.
+    `**Tool: Gemini Text Generation**
 
-IMPORTANT: This is a stateless, one-shot API - each request is independent with no memory of previous interactions. Each call to Gemini is completely isolated and cannot reference or recall any prior conversations.
+**Function:** Stateless, single-shot text generation using Google Gemini models. Each API call is an independent transaction.
 
-The 'persona' parameter should contain a detailed system prompt that:
-- Defines the assistant's role, expertise, and behavior
-- Specifies the tone, style, and format for responses
-- Includes any constraints or guidelines to follow
-- Provides context about the task or domain
+**Agent Workflow Guidance:**
+*   **Single-Shot Nature:** This tool executes one-shot generation. It has no memory of past requests.
+*   **Complex Task Handling:** For multi-step tasks (e.g., extract, then analyze, then summarize), the agent MUST chain multiple, independent calls to this tool. Do NOT combine multiple complex steps into a single request.
+*   **Long Context:** For prompts containing large data blocks (e.g., a long document), the data block MUST be placed before the primary instruction or query.
 
-For best results:
-1. Make the persona specific and detailed (e.g., "You are a senior Python developer specializing in web APIs. Provide concise, production-ready code with error handling. Focus on readability and best practices.")
-2. Structure multi-turn conversations by including previous context in the messages array
-3. Be explicit about desired output format in your messages
-4. Consider including examples in the persona for complex tasks`,
+---
+
+**Parameter: \`persona\`**
+
+The \`persona\` parameter is a mandatory system prompt that dictates all model behavior. It must adhere to the following specification.
+
+**Persona Specification:**
+
+**1. Core Principles:**
+*   **ROLE_AND_GOAL:** Must define a specific, detailed role for the AI and a clear objective.
+    *   *Example:* "You are a senior Go developer reviewing code for concurrency issues. Your goal is to identify race conditions and explain them."
+*   **SEQUENCED_INSTRUCTIONS:** Must provide a numbered list of steps for the model to follow for task execution.
+    *   *Example:* "1. Identify all imported libraries in the code. 2. For each library, list its function. 3. Output as a markdown table."
+*   **FORMAT_AND_TONE:** Must specify the exact output format (e.g., JSON, XML) and response style. State rationale if it affects parsing.
+    *   *Example:* "Output MUST be a single, valid JSON object without any surrounding text or markdown, as it will be consumed by a parser."
+
+**2. Advanced Structural Patterns:**
+*   **STRUCTURED_PROMPT_XML:** For prompts with multiple components, each component MUST be wrapped in descriptive XML tags.
+    *   *Example Persona Structure:*
+        \`\`\`xml
+        <instructions>Analyze the <document> to answer the <query>.</instructions>
+        <document>The Alani bird is a species native to the northern islands.</document>
+        \`\`\`
+        The agent then provides the user's question in the 'messages' array, wrapped in the corresponding tag: \`<query>Where is the Alani bird from?</query>\`
+*   **CHAIN_OF_THOUGHT (CoT):** To improve reasoning on complex tasks, instruct the model to perform its step-by-step analysis within \`<thinking>\` tags before providing the final, concise answer in \`<answer>\` tags. The model will output both.
+    *   *Example Persona Instruction:*
+        \`\`\`
+        <instructions>First, reason in <thinking> tags. Then, provide the final answer in <answer> tags.</instructions>
+        \`\`\`
+*   **FEW_SHOT_EXAMPLES:** To enforce a specific, non-obvious output format, provide 2-5 examples within the persona. Each example must be wrapped in \`<example>\` tags, with \`<input>\` and \`<output>\` tags inside.
+    *   *Example Persona Structure:*
+        \`\`\`xml
+        <instructions>Classify the user's sentiment.</instructions>
+        <example><input>This is fantastic!</input><output>Positive</output></example>
+        <example><input>This is terrible.</input><output>Negative</output></example>
+        \`\`\`
+`,
     GeminiToolSchema.shape,
     async (args) => {
       const validationResult = validateToolInput(args);
