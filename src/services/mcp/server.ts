@@ -21,7 +21,21 @@ export const createMcpServer = (
   
   server.tool(
     'gemini',
-    'Generate text using Google Gemini models with OAuth authentication. IMPORTANT: This is a stateless, one-shot API - each request is independent with no memory of previous interactions. Each call to Gemini is completely isolated and cannot reference or recall any prior conversations. Supports custom system prompts via the persona parameter.',
+    `Generate text using Google Gemini models with OAuth authentication.
+
+IMPORTANT: This is a stateless, one-shot API - each request is independent with no memory of previous interactions. Each call to Gemini is completely isolated and cannot reference or recall any prior conversations.
+
+The 'persona' parameter should contain a detailed system prompt that:
+- Defines the assistant's role, expertise, and behavior
+- Specifies the tone, style, and format for responses
+- Includes any constraints or guidelines to follow
+- Provides context about the task or domain
+
+For best results:
+1. Make the persona specific and detailed (e.g., "You are a senior Python developer specializing in web APIs. Provide concise, production-ready code with error handling. Focus on readability and best practices.")
+2. Structure multi-turn conversations by including previous context in the messages array
+3. Be explicit about desired output format in your messages
+4. Consider including examples in the persona for complex tasks`,
     GeminiToolSchema.shape,
     async (args) => {
       const validationResult = validateToolInput(args);
@@ -45,7 +59,6 @@ export const createMcpServer = (
       // Prepend persona as a system message
       apiMessages = [
         { role: 'user', content: persona },
-        { role: 'assistant', content: 'I understand. I will respond according to that persona.' },
         ...apiMessages
       ];
       
